@@ -1,0 +1,44 @@
+<!doctype html>
+<html ng-app="nginx-dashboard">
+  <head>
+    <meta charset="utf-8">
+    <title>NGINX Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body >
+  <div class="container-fluid"  ng-controller="main">
+
+  	<div class="row">
+  		<div class="col-md-12">
+  			<h2>Server Zones</h2>
+
+  			{{ hello }} {{}}
+	  		<table class="table">
+	  			<thead>
+	  				<tr>
+	  					<th>Zone</th>
+	  					<th>Requests</th>
+	  					<th>Responses</th>
+	  					<th>Traffic</th>
+	  					<th>Cache</th>
+	  				</tr>
+	  			</thead>
+	  			<tbody>
+	  				<tr ng-repeat="(name, zone) in nginx.cacheZones">
+	  					<td>{{ name }}</td>
+	  					<td>{{ zone.inBytes }}</td>
+	  				</tr>
+	  				
+	  			</tbody>
+	  		</table>
+  		</div>
+
+  	</div>
+  </div>
+  <script src="config.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="assets/js/app.js"></script>
+  </body>
+</html>
