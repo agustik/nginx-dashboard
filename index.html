@@ -8,43 +8,49 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
 
+    <style media="screen">
+    .removeBottomBorder {
+      border-bottom: none !important;
+    }
+
+    </style>
   </head>
   <body>
-  <div class="container-fluid"  ng-controller="main">
+  <div class="container"  ng-controller="main">
   	<div class="row">
       <div class="col-md-8">
         <h2>Server Main</h2>
         <table class="table table-condensed">
           <thead>
             <tr>
-              <th rowspan="2">Version</th>
-              <th rowspan="2">Uptime</th>
+              <th rowspan="2"><h3>Version</h3></th>
+              <th rowspan="2"><h3>Uptime</h3></th>
               <th colspan="5">Connections</th>
-              <th>Requests</th>
+              <th colspan="3">Requests</th>
             </tr>
             <tr>
-              <th>active</th>
-              <th>reading</th>
-              <th>writing</th>
-              <th>waiting</th>
-              <th>accepted</th>
-              <th>handled</th>
-              <th>total</th>
-              <th>Req/s</th>
+              <td>active</td>
+              <td>reading</td>
+              <td>writing</td>
+              <td>waiting</td>
+              <td>accepted</td>
+              <td>handled</td>
+              <td>total</td>
+              <td>Req/s</td>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>{{ nginx.nginxVersion }}</td>
               <td>{{ nginx.uptime / 1000 | readableTime}}</td>
-              <td>{{ nginx.connections.active }}</td>
-              <td>{{ nginx.connections.reading }}</td>
-              <td>{{ nginx.connections.writing }}</td>
-              <td>{{ nginx.connections.waiting }}</td>
-              <td>{{ nginx.connections.accepted }}</td>
-              <td>{{ nginx.connections.handled }}</td>
-              <td>{{ nginx.connections.total }}</td>
-              <td>{{ nginx.connections.reqs }}</td>
+              <td>{{ nginx.connections.active | io }}</td>
+              <td>{{ nginx.connections.reading | io }}</td>
+              <td>{{ nginx.connections.writing | io }}</td>
+              <td>{{ nginx.connections.waiting | io }}</td>
+              <td>{{ nginx.connections.accepted | io }}</td>
+              <td>{{ nginx.connections.handled | io }}</td>
+              <td>{{ nginx.connections.total | io }}</td>
+              <td>{{ nginx.connections.reqs | io }}</td>
             </tr>
           </tbody>
         </table>
@@ -62,34 +68,37 @@
             </tr>
             <tr>
               <!-- Requests -->
-              <th>Total</th>
-              <th>Req/s</th>
+              <td>Total</td>
+              <td>Req/s</td>
 
               <!-- Responses -->
-              <th>1xx</th>
-              <th>2xx</th>
-              <th>3xx</th>
-              <th>4xx</th>
-              <th>5xx</th>
-              <th>Total</th>
-              
+              <td>1xx</td>
+              <td>2xx</td>
+              <td>3xx</td>
+              <td>4xx</td>
+              <td>5xx</td>
+              <td>Total</td>
+
 
               <!-- Traffic -->
-              <th>Sent</th>
-              <th>Recv</th>
-              <th>Sent/s</th>
-              <th>Recv/s</th>
+              <td>Sent</td>
+              <td>Recv</td>
+              <td>Sent/s</td>
+              <td>Recv/s</td>
 
               <!-- Cache -->
-              <th>Miss</th>
-              <th>Bypass</th>
-              <th>Expired</th>
-              <th>Stale</th>
-              <th>Updating</th>
-              <th>Revalidated</th>
-              <th>Hit</th>
-              <th>Scarce</th>
-              <th>Total</th>
+              <td>Miss</td>
+              <td>Bypass</td>
+              <td>Expired</td>
+              <td>Stale</td>
+              <td>Updating</td>
+              <td>Revalidated</td>
+              <td>Hit</td>
+              <td>Scarce</td>
+              <td>Total</td>
+              <td>
+                Hit ratio
+              </td>
 
             </tr>
           </thead>
@@ -98,8 +107,8 @@
               <td>{{ name }}</td>
               <!-- Requests -->
               <td>{{ zone.requestCounter }}</td>
-              <td>{{ zone.requestCounter_S }}</td>
-              
+              <td>{{ zone.requestCounter_S | io }}</td>
+
               <!--<td>{{ zone.outBytes | bytes }}</td>
               <td>{{ zone.inBytes | bytes }}</td>
               <td>{{ zone.outBytes_S }}</td>
@@ -127,6 +136,9 @@
               <td>{{ zone.responses.hit }}</td>
               <td>{{ zone.responses.scarce }}</td>
               <td>{{ zone.responses.cacheTotal }}</td>
+              <td>
+                {{zone.hitRatio}}
+              </td>
 
               <td></td>
             </tr>
@@ -135,6 +147,10 @@
       </div>
       <div class="col-md-12">
         <h2>Upstreams</h2>
+
+        <span ng-repeat="(name, upstream) in upstreamState">
+          <span class="label" ng-class="(upstream.down) ? 'label-danger' : 'label-success'"><i class="fa fa-sitemap"></i></span><span> </span>
+        </span>
       <div  ng-repeat="(name, upstream) in nginx.upstreamZones" >
         <h3>{{name}}</h3>
         <table class="table table-condensed">
@@ -153,55 +169,41 @@
             </tr>
             <tr>
               <!-- Requests -->
-              <th>Total</th>
-              <th>Req/s</th>
+              <td>Total</td>
+              <td>Req/s</td>
 
               <!-- Responses -->
-              <th>1xx</th>
-              <th>2xx</th>
-              <th>3xx</th>
-              <th>4xx</th>
-              <th>5xx</th>
-              <th>Total</th>
-              
+              <td>1xx</td>
+              <td>2xx</td>
+              <td>3xx</td>
+              <td>4xx</td>
+              <td>5xx</td>
+              <td>Total</td>
+
 
               <!-- Traffic -->
-              <th>Sent</th>
-              <th>Recv</th>
-              <th>Sent/s</th>
-              <th>Recv/s</th>
-
-              <!-- Cache
-              <th>Miss</th>
-              <th>Bypass</th>
-              <th>Expired</th>
-              <th>Stale</th>
-              <th>Updating</th>
-              <th>Revalidated</th>
-              <th>Hit</th>
-              <th>Scarce</th>
-              <th>Total</th> -->
+              <td>Sent</td>
+              <td>Recv</td>
+              <td>Sent/s</td>
+              <td>Recv/s</td>
 
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="(k, host) in upstream">
-              <td>{{ host.server }}</td>
+              <td class="col-md-1">
+                {{ host.server }}
+              </td>
               <!-- Requests -->
-              <td><span ng-show="host.down">down</span><span ng-show="!host.down">up</span></td>
-              <td>{{ host.responeMsec }}</td>
+              <td class="col-md-1"><span ng-show="host.down">down</span><span ng-show="!host.down">up</span></td>
+              <td class="col-md-1">{{ host.responeMsec }}ms</td>
 
-              <td>{{ host.weight }}</td>
-              <td>{{ host.maxFails }}</td>
-              <td>{{ host.failTimeout }}</td>
+              <td class="col-md-1">{{ host.weight }}</td>
+              <td class="col-md-1">{{ host.maxFails }}</td>
+              <td class="col-md-1">{{ host.failTimeout }}</td>
 
-              <td>{{ host.requestCounter }}</td>
-              <td>{{ host.requestCounter_ }}</td>
-              
-              <!--<td>{{ host.outBytes | bytes }}</td>
-              <td>{{ host.inBytes | bytes }}</td>
-              <td>{{ host.outBytes_S }}</td>
-              <td>{{ host.inBytes_S }}</td>-->
+              <td class="col-md-1">{{ host.requestCounter }}</td>
+              <td class="col-md-1">{{ host.requestCounter_S | io }}</td>
 
               <td>{{ host.responses['1xx'] }}</td>
               <td>{{ host.responses['2xx'] }}</td>
@@ -222,7 +224,7 @@
       </div>
       </div>
   		<div class="col-md-12">
-  			<h2>Cache Zones</h2> <button class="btn btn-default" ng-click="cacheAdvanced = (cacheAdvanced) ? false : true">Advanced</button>
+  			<h2>Cache Zones</h2> <a href="#" class="btn btn-default" ng-click="cacheAdvanced = (cacheAdvanced) ? false : true" >Advanced</a>
 	  	<table class="table table-condensed"  ng-show="cacheAdvanced">
           <thead>
             <tr>
@@ -233,24 +235,24 @@
             </tr>
             <tr>
               <!-- Size -->
-              <th>Capacity</th>
-              <th>Used</th>
+              <td>Capacity</td>
+              <td>Used</td>
               <!-- Traffic -->
 
-              <th>Sent</th>
-              <th>Rcvd</th>
-              <th>Sent/s</th>
-              <th>Rcvd/s</th>
+              <td>Sent</td>
+              <td>Rcvd</td>
+              <td>Sent/s</td>
+              <td>Rcvd/s</td>
               <!-- Cache -->
-              <th>Miss</th>
-              <th>Bypass</th>
-              <th>Expired</th>
-              <th>Stale</th>
-              <th>Updating</th>
-              <th>Revalidated</th>
-              <th>Hit</th>
-              <th>Scarce</th>
-              <th>Total</th>
+              <td>Miss</td>
+              <td>Bypass</td>
+              <td>Expired</td>
+              <td>Stale</td>
+              <td>Updating</td>
+              <td>Revalidated</td>
+              <td>Hit</td>
+              <td>Scarce</td>
+              <td>Total</td>
 
             </tr>
           </thead>
@@ -259,7 +261,7 @@
               <td>{{ name }}</td>
               <td>{{ zone.maxSize | bytes }}</td>
               <td>{{ zone.usedSize | bytes }}</td>
-              
+
               <td>{{ zone.outBytes | bytes }}</td>
               <td>{{ zone.inBytes | bytes }}</td>
               <td>{{ zone.outBytes_S  | bytes}}</td>
@@ -277,36 +279,48 @@
             </tr>
           </tbody>
         </table>
-        <table class="table table-condensed"  ng-show="!cacheAdvanced">
+        <table class="table"  ng-show="!cacheAdvanced">
           <thead>
             <tr>
-              <th><h3>Zone</h3> </th>
-              <th>State</th>
-              <th>Capacity</th>
-              <th>Used</th>
-              <th>Traffic</th>
-              <th>Used</th>
-              <th>Hit ratio</th>
+              <th rowspan="2"><h3>Zone</h3></th>
+              <th rowspan="2"><h3>Capacity</h3></th>
+              <th rowspan="2"><h3>Used</h3></th>
+              <th colspan="2" class="removeBottomBorder">Traffic</th>
+              <th rowspan="2"><h3>Hit ratio</h3></th>
+            </tr>
+            <tr>
+              <td>
+                 <small>
+                   Served
+                 </small>
+              </td>
+              <td>
+                <small>
+                  Written
+                </small>
+              </td>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="(name, zone) in nginx.cacheZones">
               <td>{{ name }}</td>
-              <td>warm ? </td>
               <td>{{ zone.maxSize | bytes }}</td>
               <td>
-                <div class="progress">
+                <div class="progress" tooltip="{{ zone.usedSize | bytes }}">
                   <div class="progress-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{  (zone.usedSize / zone.maxSize)*100 }}%;">
                     {{  (zone.usedSize / zone.maxSize)*100 | number:1 }} %
                   </div>
                 </div>
               </td>
-              <td>{{ zone.outBytes | bytes }}</td>
-              <td>{{ zone.inBytes | bytes }}</td>
+              <td>
+                Served:{{ zone.outBytes | bytes }}
+              </td>
+              <td>
+                  {{ zone.inBytes | bytes }}</td>
               <td>
                 <c3chart bindto-id="gauge-plot1-chart-{{name}}">
                   <chart-size chart-height="55" chart-width="80"/>
-                  
+
                   <chart-column column-id="{{name}}"
                               column-values="{{zone.hitRatio}}"
                               column-type="gauge"/>
@@ -328,6 +342,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js"></script>
+
   <script src="assets/js/c3-angular.min.js"></script>
   <script src="assets/js/app.js"></script>
   </body>

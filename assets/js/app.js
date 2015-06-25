@@ -1,4 +1,4 @@
-var app = angular.module('nginx-dashboard', ['gridshore.c3js.chart']);
+var app = angular.module('nginx-dashboard', ['gridshore.c3js.chart', 'ui.bootstrap']);
 
 console.log(config.server);
 var graphApp = angular.module('graphApp', ['gridshore.c3js.chart']);
@@ -9,6 +9,22 @@ graphApp.controller('GraphCtrl', function ($scope) {
 app.controller('main', [ "$scope", "$interval", "req", function ($scope, $interval, req){
 	$scope.nginx= {};
 
+	$scope.upstreamState=[];
+
+	$scope.status ={
+			server: {
+				state : true,
+				description : false
+			},
+			upstream : {
+				state : true,
+				description : false
+			},
+			cache : {
+				state : true,
+				description : false
+			}
+	};
 
 	$scope.cacheAdvanced=false;
 
@@ -18,16 +34,26 @@ app.controller('main', [ "$scope", "$interval", "req", function ($scope, $interv
 
 			d.uptime = d.nowMsec - d.loadMsec;
 
-			
+			$scope.upstreamState=$scope.getHostState(d);
 
 			d.connections.total = $scope.getTotal(d.connections);
 
-			console.log(d.connections);
 			if('connections' in $scope.nginx){
 				d.connections.reqs = $scope.prSecond(d.connections.total, $scope.nginx.connections.total);
 			}
+
+			if ('upstreamZones' in $scope.nginx){
+				for (var upstream in d.upstreamZones){
+					for (var host in d.upstreamZones[upstream]){
+						if(host in $scope.nginx.upstreamZones[upstream]){
+							d.upstreamZones[upstream][host].requestCounter_S=$scope.prSecond(d.upstreamZones[upstream][host].requestCounter, $scope.nginx.upstreamZones[upstream][host].requestCounter );
+						}
+					}
+				}
+			}
+
 			for (var zone in d.serverZones){
-				//d.cacheZones=$scope.getTotal();
+
 
 				d.serverZones[zone].responses.statusTotal=$scope.getTotal(d.serverZones[zone].responses, 'status');
 				d.serverZones[zone].responses.cacheTotal=$scope.getTotal(d.serverZones[zone].responses, 'cache');
@@ -40,6 +66,8 @@ app.controller('main', [ "$scope", "$interval", "req", function ($scope, $interv
 					d.serverZones[zone].outBytes_S=$scope.prSecond(d.serverZones[zone].outBytes, $scope.nginx.serverZones[zone].outBytes)
 
 				}
+				
+				d.serverZones[zone].hitRatio=$scope.hitRatio(d.serverZones[zone].responses);
 
 			}
 			for (var zone in d.cacheZones){
@@ -48,15 +76,29 @@ app.controller('main', [ "$scope", "$interval", "req", function ($scope, $interv
 
 					d.cacheZones[zone].inBytes_S=$scope.prSecond(d.cacheZones[zone].inBytes, $scope.nginx.cacheZones[zone].inBytes);
 					d.cacheZones[zone].outBytes_S=$scope.prSecond(d.cacheZones[zone].outBytes, $scope.nginx.cacheZones[zone].outBytes);
-					console.log(d.cacheZones[zone].outBytes_S);
 				}
 				d.cacheZones[zone].responses.total=$scope.getTotal(d.cacheZones[zone].responses, 'cache');
 				d.cacheZones[zone].hitRatio=$scope.hitRatio(d.cacheZones[zone].responses);
 			}
+
+			console.log(d);
 			$scope.nginx= d;
-	
+
 		});
+
+		//$interval.cancel($scope.start);
 	},1000)
+
+	$scope.getHostState = function (obj){
+		var upstream, server, arr = [];
+		for (upstream in obj.upstreamZones){
+			 for(server in obj.upstreamZones[upstream]){
+				arr.push( { down : obj.upstreamZones[upstream][server].down, server : obj.upstreamZones[upstream][server].server });
+			 }
+		}
+
+		return arr;
+	};
 
 	$scope.prSecond = function (a,b){
 		return a-b;
@@ -92,16 +134,14 @@ app.controller('main', [ "$scope", "$interval", "req", function ($scope, $interv
 					total +=obj[key];
 				}
 			}
-			
-			
+
+
 		}
 
 		return total;
-	}
+	};
 
-	$scope.compare = function (){
 
-	}
 }]);
 
 
@@ -113,7 +153,7 @@ app.service('req', ['$http','$q', function ($http, $q){
         $http.get(config.server + "?" + time).success(function(data){
           deferred.resolve(data);
       	}).error(function(data){
- 
+
         //deferred.reject("An error occured while fetching items");
         deferred.resolve(data);
       });
@@ -130,6 +170,13 @@ app.filter('bytes', function() {
 		var units = ['b', 'kB', 'MB', 'GB', 'TB', 'PB'],
 			number = Math.floor(Math.log(bytes) / Math.log(1024));
 		return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
+	}
+});
+
+app.filter('io', function() {
+	return function(bytes) {
+		if (isNaN(parseFloat(bytes)) || !isFinite(bytes) || bytes === 0) return '-';
+		return bytes;
 	}
 });
 
