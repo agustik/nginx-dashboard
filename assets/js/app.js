@@ -83,9 +83,6 @@ app.controller('main', [ "$scope", "$interval", "$log", "req", function ($scope,
 					d.serverZones[zone].cacheTotal=$scope.getTotal(d.serverZones[zone].responses, 'cache');
 
 
-				}else{
-					$scope.ServerTraffic[zone] = [];
-					$scope.ServerStatus[zone] = [];
 				}
 
 				d.serverZones[zone].hitRatio=$scope.hitRatio(d.serverZones[zone].responses);
@@ -135,8 +132,6 @@ app.controller('main', [ "$scope", "$interval", "$log", "req", function ($scope,
 						"Received" : (d.traffic.inBytes_S / 1024)
 				});
 			}
-
-
 
 			$log.info(d);
 			$scope.nginx= d;
