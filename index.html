@@ -16,7 +16,7 @@
     </style>
   </head>
   <body>
-  <div class="container"  ng-controller="main">
+  <div class="container-fluid"  ng-controller="main">
   	<div class="row">
       <div class="col-md-8">
         <h2>Server Main</h2>
@@ -49,11 +49,27 @@
               <td>{{ nginx.connections.waiting | io }}</td>
               <td>{{ nginx.connections.accepted | io }}</td>
               <td>{{ nginx.connections.handled | io }}</td>
-              <td>{{ nginx.connections.total | io }}</td>
+              <td>{{ nginx.total | io }}</td>
               <td>{{ nginx.connections.reqs | io }}</td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <c3chart bindto-id="chart_requests" chart-data="mainGraph" chart-columns="mainGraphCols" chart-x="datax">
+            <chart-size chart-height="150"/>
+            <chart-axis-x show="false"></chart-axis-x>
+            <chart-axis-y show="true"></chart-axis-y>
+            <chart-legend show-legend="true" legend-position="right"/>
+        </div>
+        <div class="col-md-6">
+          <c3chart bindto-id="chart_traffic" chart-data="mainTrafficGraph" chart-columns="mainTrafficGraphCols" chart-x="datax">
+            <chart-size chart-height="150" />
+            <chart-axis-x show="false"></chart-axis-x>
+            <chart-axis-y show="true"></chart-axis-y>
+            <chart-legend show-legend="true" legend-position="right"/>
+        </div>
       </div>
       <div class="col-md-12">
         <h2>vHosts</h2>
@@ -119,7 +135,7 @@
               <td>{{ zone.responses['3xx'] }}</td>
               <td>{{ zone.responses['4xx'] }}</td>
               <td>{{ zone.responses['5xx'] }}</td>
-              <td>{{ zone.responses.statusTotal }}</td>
+              <td>{{ zone.statusTotal }}</td>
 
               <td>{{ zone.outBytes | bytes }}</td>
               <td>{{ zone.inBytes | bytes }}</td>
@@ -135,9 +151,13 @@
               <td>{{ zone.responses.revalidated }}</td>
               <td>{{ zone.responses.hit }}</td>
               <td>{{ zone.responses.scarce }}</td>
-              <td>{{ zone.responses.cacheTotal }}</td>
+              <td>{{ zone.cacheTotal }}</td>
               <td>
-                {{zone.hitRatio}}
+                <div class="progress" tooltip="{{ zone.cacheTotal }}">
+                  <div  class="progress-bar" role="progressbar" aria-valuenow="zone.hitRatio" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ zone.hitRatio }}%;">
+                    {{  zone.hitRatio | number:0 }} %
+                  </div>
+                </div>
               </td>
 
               <td></td>
@@ -210,7 +230,7 @@
               <td>{{ host.responses['3xx'] }}</td>
               <td>{{ host.responses['4xx'] }}</td>
               <td>{{ host.responses['5xx'] }}</td>
-              <td>{{ host.responses.statusTotal }}</td>
+              <td>{{ host.statusTotal }}</td>
 
               <td>{{ host.outBytes | bytes }}</td>
               <td>{{ host.inBytes | bytes }}</td>
@@ -224,7 +244,7 @@
       </div>
       </div>
   		<div class="col-md-12">
-  			<h2>Cache Zones</h2> <a href="#" class="btn btn-default" ng-click="cacheAdvanced = (cacheAdvanced) ? false : true" >Advanced</a>
+  			<h2>Cache Zones</h2> <button class="btn btn-primary" ng-click="cacheAdvanced = (cacheAdvanced) ? false : true" >Advanced</button>
 	  	<table class="table table-condensed"  ng-show="cacheAdvanced">
           <thead>
             <tr>
@@ -275,7 +295,7 @@
               <td>{{ zone.responses.revalidated }}</td>
               <td>{{ zone.responses.hit }}</td>
               <td>{{ zone.responses.scarce }}</td>
-              <td>{{ zone.responses.total }}</td>
+              <td>{{ zone.total }}</td>
             </tr>
           </tbody>
         </table>
